@@ -183,8 +183,8 @@ SPECTACULAR_SETTINGS = {
     'SECURITY': [{'oauth2': ['read', 'write', 'groups']}],
 
     'SWAGGER_UI_OAUTH2_CONFIG': {
-        'clientId': 'zwBk8ADzavw3PRCaQWBv8o7w7nojnVO6XvIXctUl',
-        'clientSecret': 'QuE9XudMJbusNanwdqFsv8tS8kh4XwIq8fdwSnNwpANzySdF3aXwJPay6kGb6O7rilbezwbTQy6MfhGFPEsa9KrcWQ5W7sPys4dAXJw7MmyEEOauzTD2BiETpgGwRZov',
+        'clientId': '',
+        'clientSecret': '',
     },
 }
 
