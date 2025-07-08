@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework.filters import SearchFilter
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 
@@ -32,13 +33,15 @@ class BlogViewSet(viewsets.ModelViewSet):
     serializer_class = BlogSerializer
     queryset = Blog.objects.all()
     lookup_field = "slug"
+    filter_backends = [SearchFilter, ]
+    search_fields = ['title', 'body', 'author__username']
 
     def get_permissions(self):
         if self.action in ('update', 'partial_update', 'destroy'):
             return [permissions.IsAuthenticated(), IsAuthorOrReadOnly()]
         elif self.action == 'create':
             return [permissions.IsAuthenticated()]
-        return [permissions.IsAuthenticated()]
+        return [permissions.IsAuthenticatedOrReadOnly()]
 
     def get_queryset(self):
         if self.action in ('list', 'retrieve', 'create'):
