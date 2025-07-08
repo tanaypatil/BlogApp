@@ -5,14 +5,16 @@ from Api.models import Blog, Tag, Comment, BlogUser
 
 class BlogUserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(max_length=30, allow_empty_file=False, use_url=True)
+    bio = serializers.CharField(allow_blank=True, allow_null=True, required=False)
 
     def create(self, validated_data):
         blog_user = BlogUser(
             username=validated_data['username'],
             email=validated_data['email'],
             profile_picture=validated_data['profile_picture'],
-            bio=validated_data['bio'],
         )
+        if 'bio' in validated_data:
+            blog_user.bio = validated_data['bio']
         blog_user.set_password(validated_data['password'])
         blog_user.save()
         return blog_user

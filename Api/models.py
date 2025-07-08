@@ -10,7 +10,7 @@ BLOG_CATEGORIES = [
 
 
 class BlogUser(AbstractUser):
-    bio = models.TextField()
+    bio = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to="images/profile_pictures")
 
     def __str__(self):
