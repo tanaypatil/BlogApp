@@ -39,10 +39,12 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'rest_framework',
     'drf_spectacular',
+    'corsheaders',
     'Api.apps.ApiConfig'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -189,3 +191,4 @@ SPECTACULAR_SETTINGS = {
 }
 
 APPEND_SLASH = True
+CORS_ALLOW_ALL_ORIGINS = True
