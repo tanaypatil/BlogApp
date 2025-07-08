@@ -1,8 +1,9 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
-from rest_framework.filters import SearchFilter
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from Api.filters import BlogFilter
 from Api.models import Blog, Comment, BlogUser
 from Api.permissions import IsAuthorOrReadOnly, IsUserOrReadOnly, IsSelfOrReadOnly, AllowUnauthenticatedOnly
 from Api.serializers import BlogSerializer, CommentSerializer, BlogUserSerializer
@@ -31,10 +32,10 @@ class BlogUserViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, De
 
 class BlogViewSet(viewsets.ModelViewSet):
     serializer_class = BlogSerializer
-    queryset = Blog.objects.all()
+    queryset = Blog.objects.select_related('author').prefetch_related('tags')
     lookup_field = "slug"
-    filter_backends = [SearchFilter, ]
-    search_fields = ['title', 'body', 'author__username']
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = BlogFilter
 
     def get_permissions(self):
         if self.action in ('update', 'partial_update', 'destroy'):
@@ -45,7 +46,7 @@ class BlogViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.action in ('list', 'retrieve', 'create'):
-            return self.queryset.all()
+            return self.queryset
         return self.queryset.filter(author=self.request.user)
 
     def perform_create(self, serializer):
