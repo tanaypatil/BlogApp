@@ -33,8 +33,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class BlogSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
-    author = BlogUserSerializer(read_only=True)
+    tags = serializers.StringRelatedField(many=True)
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
 
     def create(self, validated_data):
         tag_names = validated_data.pop('tags', [])
