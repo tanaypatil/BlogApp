@@ -35,6 +35,11 @@ class TagSerializer(serializers.ModelSerializer):
 class BlogSerializer(serializers.ModelSerializer):
     tags = serializers.StringRelatedField(many=True)
     author = serializers.StringRelatedField(read_only=True)
+    profile_picture = serializers.ImageField(
+        source='author.profile_picture',
+        read_only=True,
+        use_url=True
+    )
 
     def create(self, validated_data):
         tag_names = validated_data.pop('tags', [])
@@ -56,7 +61,7 @@ class BlogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Blog
         fields = '__all__'
-        read_only_fields = ['author', 'created', 'slug']
+        read_only_fields = ['author', 'created', 'slug', 'profile_picture']
 
 
 class CommentSerializer(serializers.ModelSerializer):
