@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from Api.viewsets import BlogViewSet, CommentViewSet, BlogUserViewSet
+from Api.viewsets import BlogViewSet, CommentViewSet, BlogUserViewSet, TagViewSet
 
 user_routes = BlogUserViewSet.as_view({
     'get': 'retrieve',
@@ -13,3 +13,4 @@ user_routes = BlogUserViewSet.as_view({
 router = routers.SimpleRouter()
 router.register(r'blogs', BlogViewSet, basename='blog')
 router.register(r'comments', CommentViewSet, basename='comment')
+router.register(r'tags', TagViewSet, basename='tag')
