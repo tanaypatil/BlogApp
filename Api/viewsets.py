@@ -1,11 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, \
     ListModelMixin
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from Api.filters import BlogFilter
-from Api.models import Blog, Comment, BlogUser, Tag
+from Api.models import Blog, Comment, BlogUser, Tag, BLOG_CATEGORIES
 from Api.permissions import IsAuthorOrReadOnly, IsUserOrReadOnly, IsSelfOrReadOnly, AllowUnauthenticatedOnly
 from Api.serializers import BlogSerializer, CommentSerializer, BlogUserSerializer, TagSerializer
 
@@ -83,5 +84,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 class TagViewSet(ListModelMixin, GenericViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = None
+
+
+class CategoryViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
+    def list(self, request):
+        catgories = [x[0] for x in BLOG_CATEGORIES]
+        return Response(data=catgories, status=status.HTTP_200_OK)
