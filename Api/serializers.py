@@ -34,6 +34,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     tags = serializers.StringRelatedField(many=True)
+    tag_names = serializers.ListField(child=serializers.CharField(), write_only=True, required=False)
     author = serializers.StringRelatedField(read_only=True)
     profile_picture = serializers.ImageField(
         source='author.profile_picture',
@@ -42,19 +43,20 @@ class BlogSerializer(serializers.ModelSerializer):
     )
 
     def create(self, validated_data):
-        tag_names = validated_data.pop('tags', [])
+        tag_names = validated_data.pop('tag_names', [])
+        validated_data.pop('tags', None)
         blog = Blog.objects.create(**validated_data)
-        tags = [Tag.objects.get_or_create(name=tag['name'])[0] for tag in tag_names]
+        tags = [Tag.objects.get_or_create(name=tag)[0] for tag in tag_names]
         blog.tags.set(tags)
         return blog
 
     def update(self, instance, validated_data):
-        tag_names = validated_data.pop('tags', [])
+        tag_names = validated_data.pop('tag_names', [])
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         if tag_names:
-            tags = [Tag.objects.get_or_create(name=tag['name'])[0] for tag in tag_names]
+            tags = [Tag.objects.get_or_create(name=tag)[0] for tag in tag_names]
             instance.tags.set(tags)
         return instance
 
