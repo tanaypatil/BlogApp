@@ -41,6 +41,9 @@ class Blog(models.Model):
     def __str__(self):
         return self.title
 
+    def preview_body(self):
+        return ' '.join(self.body.split(" ")[:30])
+
     class Meta:
         verbose_name = 'Blog'
         verbose_name_plural = 'Blogs'

@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, \
     ListModelMixin
 from rest_framework.response import Response
@@ -8,7 +9,7 @@ from rest_framework.viewsets import GenericViewSet
 from Api.filters import BlogFilter
 from Api.models import Blog, Comment, BlogUser, Tag, BLOG_CATEGORIES
 from Api.permissions import IsAuthorOrReadOnly, IsUserOrReadOnly, IsSelfOrReadOnly, AllowUnauthenticatedOnly
-from Api.serializers import BlogSerializer, CommentSerializer, BlogUserSerializer, TagSerializer
+from Api.serializers import BlogSerializer, CommentSerializer, BlogUserSerializer, TagSerializer, PreviewBlogSerializer
 
 
 class BlogUserViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
@@ -39,15 +40,32 @@ class BlogViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = BlogFilter
 
+    @action(detail=False,
+            methods=['get'],
+            serializer_class=PreviewBlogSerializer,
+            url_path='preview',
+            name='preview',
+            url_name='preview')
+    def preview(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = PreviewBlogSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = PreviewBlogSerializer(queryset, many=True)
+        return Response(serializer.data)
+
     def get_permissions(self):
         if self.action in ('update', 'partial_update', 'destroy'):
             return [permissions.IsAuthenticated(), IsAuthorOrReadOnly()]
         elif self.action == 'create':
             return [permissions.IsAuthenticated()]
-        return [permissions.IsAuthenticatedOrReadOnly()]
+        elif self.action == 'preview':
+            return [permissions.IsAuthenticatedOrReadOnly()]
+        return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
-        if self.action in ('list', 'retrieve', 'create'):
+        if self.action in ('list', 'retrieve', 'create', 'preview'):
             return self.queryset
         return self.queryset.filter(author=self.request.user)
 
@@ -91,6 +109,7 @@ class TagViewSet(ListModelMixin, GenericViewSet):
 class CategoryViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['get']
+
     def list(self, request):
         catgories = [x[0] for x in BLOG_CATEGORIES]
         return Response(data=catgories, status=status.HTTP_200_OK)
