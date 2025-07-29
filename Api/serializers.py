@@ -33,20 +33,19 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class PreviewBlogSerializer(serializers.ModelSerializer):
-    tags = serializers.StringRelatedField(many=True)
-    tag_names = serializers.ListField(child=serializers.CharField(), write_only=True, required=False)
+    tags = serializers.StringRelatedField(many=True, read_only=True)
+    tag_names = serializers.ListField(child=serializers.CharField(), read_only=True)
     author = serializers.StringRelatedField(read_only=True)
     profile_picture = serializers.ImageField(
         source='author.profile_picture',
         read_only=True,
         use_url=True
     )
-    preview_body = serializers.CharField()
+    preview_body = serializers.CharField(read_only=True)
 
     class Meta:
         model = Blog
         exclude = ['body']
-        read_only_fields = ['author', 'created', 'slug', 'profile_picture', 'preview_body']
 
 
 class BlogSerializer(serializers.ModelSerializer):

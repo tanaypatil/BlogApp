@@ -50,7 +50,7 @@ class BlogViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = PreviewBlogSerializer(page, many=True)
+            serializer = PreviewBlogSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
         serializer = PreviewBlogSerializer(queryset, many=True)
         return Response(serializer.data)
